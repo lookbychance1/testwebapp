@@ -43,7 +43,34 @@ document and simply extract images from it.
 
 """
 
-app = Flask(__name__)
+import os
+
+# Determine the directory containing this file.  Use it to locate the
+# templates directory explicitly.  This makes it possible to run the app
+# even if the working directory changes or the app is deployed from a
+# different location.  Flask defaults to looking for a ``templates``
+# directory relative to the current working directory; specifying
+# ``template_folder`` ensures the correct path is used.
+basedir = os.path.abspath(os.path.dirname(__file__))
+primary_template_dir = os.path.join(basedir, 'templates')
+fallback_template_dir = os.path.join(basedir, 'sharepremium', 'templates')
+
+# Determine which template directory actually contains index.html.  This
+# fallback logic allows the application to run correctly regardless of
+# whether the repository is structured with templates/ at the top level
+# or nested inside a "sharepremium" directory (for example, if the
+# project was zipped with an extra folder).  If neither directory
+# contains the expected template, Flask will raise an error as usual.
+if os.path.exists(os.path.join(primary_template_dir, 'index.html')):
+    chosen_template_dir = primary_template_dir
+elif os.path.exists(os.path.join(fallback_template_dir, 'index.html')):
+    chosen_template_dir = fallback_template_dir
+else:
+    # Default to the primary directory; errors will surface later if
+    # templates are indeed missing.
+    chosen_template_dir = primary_template_dir
+
+app = Flask(__name__, template_folder=chosen_template_dir)
 # A secret key is required for flash messages; this should be changed in
 # production via an environment variable.
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "change-me")
@@ -141,12 +168,34 @@ def extract_images_only(input_path: str) -> str:
                 blocks = page.get_text("dict").get("blocks", [])
             except Exception:
                 blocks = []
+            # Calculate the area of the original page.  Used to skip overly
+            # large images that are likely background graphics or watermarks.
+            page_area = page.rect.width * page.rect.height
+            # Define a maximum image area ratio; images whose area exceeds
+            # this fraction of the page are considered background and will
+            # be skipped.  The default threshold (0.2) can be overridden
+            # via the MAX_IMAGE_AREA_RATIO environment variable.
+            try:
+                max_ratio = float(os.environ.get("MAX_IMAGE_AREA_RATIO", 0.2))
+            except Exception:
+                max_ratio = 0.2
             for block in blocks:
                 if block.get('type') == 1:
                     # Extract bounding box and binary image data
                     bbox = block.get('bbox')
                     image_bytes = block.get('image')
                     if not bbox or not image_bytes:
+                        continue
+                    # Compute the area ratio to decide if this is a
+                    # background/watermark.  Skip if it exceeds the
+                    # configured threshold.
+                    rect_area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
+                    try:
+                        ratio = rect_area / page_area if page_area else 0
+                    except Exception:
+                        ratio = 0
+                    if ratio > max_ratio:
+                        # Skip large background/watermark images
                         continue
                     rect = fitz.Rect(bbox)
                     # Insert the image into the new page at its original position
