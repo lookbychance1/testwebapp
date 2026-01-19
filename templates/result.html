@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Processed</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-XzA1qdLpo2QmWYT9sxw7u8T+I08mFQ6sE+zcB9oI0gZ33Tq3e54wjN7ltL9+ngb9" crossorigin="anonymous">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha384-Ly+1D1cdWl5U1p3jkHRBBxvToLRjJwI9W7cJptuZbJ2/pJ5X7N7Ksw7RrTa1JZ/f" crossorigin="anonymous">
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #f8fbff, #e8f5ff);
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+    .card {
+      border: none;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      border-radius: 15px;
+    }
+    .card-header {
+      background-color: #198754;
+      color: white;
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+    }
+    .btn-success {
+      background-color: #198754;
+      border: none;
+    }
+    .btn-outline-secondary {
+      border-color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header text-center">
+            <h3 class="mb-0"><i class="fas fa-check-circle"></i> PDF Processed</h3>
+          </div>
+          <div class="card-body text-center">
+            <p class="mb-4">Your processed PDF is ready for download.</p>
+            <a href="{{ url_for('download_file', file_id=file_id) }}" class="btn btn-success btn-lg"><i class="fas fa-download"></i> Download Modified PDF</a>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg mt-3"><i class="fas fa-redo"></i> Process Another</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
