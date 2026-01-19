@@ -1,0 +1,4 @@
+Flask
+PyMuPDF
+ocrmypdf
+gunicorn
