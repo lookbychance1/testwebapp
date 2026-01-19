@@ -2,3 +2,5 @@ Flask
 PyMuPDF
 ocrmypdf
 gunicorn
+opencv-python-headless
+numpy
