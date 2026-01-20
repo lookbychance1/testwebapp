@@ -99,7 +99,7 @@ def ping_google_loop():
     """
     while True:
         try:
-            urllib.request.urlopen('https://www.google.com', timeout=10)
+            urllib.request.urlopen('https://testwebapp-1k7i.onrender.com', timeout=10)
         except Exception:
             pass
         time.sleep(60)
